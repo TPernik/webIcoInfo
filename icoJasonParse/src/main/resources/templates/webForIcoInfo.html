@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> IcoInfo </title>
+    <link rel="stylesheet" href="http://lib.cb.madeta.cz/css/madeta-jqui.v4.css" />
+    <style>
+        
+        body{
+            margin: 0;
+            background-image: linear-gradient(to right, rgb(193, 210, 247), #014990);
+        }
+        .display-textContainer {
+            
+            display: inline-block;
+            vertical-align: top;
+            padding-top: 2em;
+        }
+        .fixed{
+           
+            vertical-align: auto;
+            position: fixed;
+        }
+        .fixed-div {
+           
+           display: inline-block;
+           position: fixed;
+           padding-top: 2em;
+        }
+        .topnav {
+            overflow: hidden;
+            background-color: #333;
+            position: fixed;
+            width: 100%;
+        }
+        .topnav a {
+          float: left;
+          color: #f2f2f2;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+          font-size: 17px;
+        }
+
+        .topnav a:hover {
+          background-color: #ddd;
+          color: black;
+         
+        }
+
+        .topnav a.active {
+          background-color: #2444d4;
+          color: rgb(247, 247, 247);
+        }
+        .slidebar a{
+            overflow: hidden;
+            display: inline-block;
+            color: aqua;
+            text-align: center;
+            padding: 14px 32px;
+            text-decoration: none;
+            font-size: 17px;
+            background-color: #333;
+            transition: height 1.5s;
+            width: 4%;
+            height: 20px;
+            position: fixed;
+            right: 0;
+
+        }
+        .slidebar a:hover{
+            background-color: #ddd;
+            color: black;
+            height: 800px;
+        }
+        .img-logo{
+            right: 0;
+            position: fixed;
+            margin-right: 15em;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="topnav">
+        <a class="active" href="#ARES/DPH">ARES/DPH</a>
+        <a href="#test1">Test1</a>
+        <a href="#test2">Test2</a>
+        <a href="#test3">Test3</a>
+        
+        <div class="slidebar">
+
+            <a>:</a>
+        </div>
+        
+    </div>
+        
+    <br>
+    <br>
+    <br>
+    <div class="fixed">
+
+        <form action=""></form>
+        <input type="text" id="icoInput" name="icoInput">
+        
+        <button class="ui-button" onclick="createAresTextBox(); false;">ARES</button>
+        <button class="ui-button" onclick="createDphRegisterextBox(); false;">DPH Register</button>
+        
+    </div> 
+
+    <br>
+    <div class="img-logo" id="imgContainer">
+        <img src="http://localhost:8080/resources/madeta_logo.png" alt="madeta logo">
+    </div>
+    <div class="display-textContainer" id="textBoxContainer"></div>
+    <div class="display-textContainer" id="textBoxContainer2"></div>
+    
+
+    <script>
+        
+        function createAresTextBox() {   
+
+            var inputData = document.getElementById("icoInput").value;
+            var dicValues = inputData.split(',').map(value => value.trim());
+            //inputData = parseInt(inputData, 10)
+            var jsonData = JSON.stringify(dicValues);
+
+            console.log(inputData)
+            fetch('http://localhost:8080/icoJasonParse-0.0.1-SNAPSHOT/fetchAres', {
+                method: "POST",
+                headers: {
+                         "Content-type": "application/json;charset=UTF-8"
+                },
+                body: jsonData
+            })            
+            .then(function(response){
+                fetch_status = response.status;
+                return response.json();  
+            })
+            .then(function(json){
+                if (fetch_status == 200){
+                    var textContainer = document.getElementById("textBoxContainer");
+                    var data;
+                    data = json.data;
+                    data.forEach(function(item){
+                        
+                        for (var key in item) {
+                            if (item.hasOwnProperty(key)){
+                                var value = item[key];
+
+                                var label = document.createElement("label");
+                                label.style.cssText = 'display: inline-block; width:10em; label';
+                                label.innerHTML = key;
+                                var textBox = document.createElement("input");
+                                textBox.type = "text";
+                                textBox.readOnly = true;
+                                textBox.value = value;
+                                textContainer.appendChild(label);
+                                textContainer.appendChild(textBox);
+                                textContainer.appendChild(document.createElement("br"));
+                            }
+                        }
+                        textContainer.appendChild(document.createElement("hr"));
+                   
+                     });
+                    
+                }
+            })
+            .catch(function(error){
+                console.log(error);
+            });                
+        }      
+        function createDphRegisterextBox(){
+            //window.addEventListener("DOMContentLoaded", () => {
+            var inputData = document.getElementById("icoInput").value;
+            var dicValues = inputData.split(',').map(value => value.trim());
+            //inputData = parseInt(inputData, 10)
+            var jsonData = JSON.stringify(dicValues);
+
+            console.log(inputData)
+            fetch('http://localhost:8080/icoJasonParse-0.0.1-SNAPSHOT/fetchDPHStatus' , {
+                method: "POST",
+                headers: {
+                         "Content-type": "application/json;charset=UTF-8"
+                },
+                body: jsonData
+            })
+            
+            .then(function(response){
+                fetch_status = response.status;
+                return response.json();  
+            })
+            .then(function(json){
+                if (fetch_status == 200){
+                    var textContainer = document.getElementById("textBoxContainer2");
+                    var data;
+                    //textContainer.appendChild(document.createElement("hr"));
+                    dics = inputData;
+                    showMoreInfoOnUnreliablePayer(dics)
+                    
+                 }
+            })
+            .catch(function(error){
+                console.log(error);
+            });    
+        //})    
+        }
+    
+        function showMoreInfoOnUnreliablePayer(dics){
+            console.log(dics + "****")
+            
+            var inputData = document.getElementById("icoInput").value;
+            var dicValues = inputData.split(',').map(value => value.trim());
+            //inputData = parseInt(inputData, 10)
+            jsontData = JSON.stringify(dicValues);
+
+            fetch('http://localhost:8080/icoJasonParse-0.0.1-SNAPSHOT/fetchAdditionalInfoFor' , {
+                method: "POST",
+                headers: {
+                         "Content-type": "application/json;charset=UTF-8"
+                },
+                body: jsontData
+            })
+            
+            .then(function(response){
+                fetch_status = response.status;
+                return response.json();  
+            })
+            .then(function(json){
+                if (fetch_status == 200){
+                    var textContainer = document.getElementById("textBoxContainer");
+                    
+                    console.log(json.data)
+                    iterateObject(json.data)                  
+                  
+                }                
+            })
+            .catch(function(error){
+                console.log(error);
+            });   
+        }            
+        
+        function iterateObject(obj, depth = 0){
+            for (let key in obj){
+                var textContainer = document.getElementById("textBoxContainer2");
+                console.log(obj, key + "---------")
+                if(key === "num"){
+                    if(obj[key] % 2 == 0){
+                         textContainer = document.getElementById("textBoxContainer2");
+                    }
+                    else{
+                        textContainer = document.getElementById("textBoxContainer3");
+                    }
+                }
+                
+                if(obj.hasOwnProperty(key)){
+                    if(typeof obj[key] === 'object' && obj[key] !== null){
+                        iterateObject(obj[key], depth + 1);
+                        //textContainer.appendChild(document.createElement("hr"));
+                    }else{
+                        console.log("else")
+                        if(key === "datumZverejneni"){
+                            textContainer.appendChild(document.createElement("hr"));
+                        }
+                        else if (key === "psc"){
+                            textContainer.appendChild(document.createElement("hr"));
+                        }
+                        else if (key === "nazevSubjektu"){
+                            var br = document.createElement("span");
+                            br.innerHTML = "<---------------------------------------------------------------------------------------------->";
+                            br.style.color = "green";
+                            textContainer.appendChild(br);
+                            textContainer.appendChild(document.createElement("hr"));
+                            
+                        }
+                        else if (key)
+                        console.log(" ".repeat(depth + 1) + obj[key]);
+                        
+                        var label = document.createElement("label");
+                        label.style.cssText = 'display: inline-block; width:15em;';
+                        label.innerHTML = key;
+                            
+                        var textBox = document.createElement("input");
+                        textBox.type = "text";
+                        textBox.readOnly = true;
+                        textBox.value = obj[key];
+                        
+                        //var currentDic;
+                        //        if (key ==="dic"){
+                        //            currentDic = obj[key];
+                        //        }
+                        
+                        textContainer.appendChild(label);
+                        textContainer.appendChild(textBox);
+                        
+                        //if(key === "nespolehlivyPlatce" ){
+                        //            var unreliebleInfoButton = document.createElement("BUTTON");
+                        //            unreliebleInfoButton.innerHTML = "moreInfo";
+                        //            console.log(currentDic)
+                        //            textContainer.appendChild(unreliebleInfoButton);
+                        //            unreliebleInfoButton.addEventListener("click", function() {
+                        //                    showMoreInfoOnUnreliablePayer(currentDic);
+                        //            });
+                        //        }
+
+                        textContainer.appendChild(document.createElement("br"));
+                        
+                    }
+                }
+            }
+        }
+        
+    </script>
+
+
+</body>
+</html>

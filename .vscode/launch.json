@@ -1,0 +1,96 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "com.example.mariaDbForIcodic.test",
+            "projectName": "mariaDbForIcodic"
+        },
+        {
+            "type": "java",
+            "name": "DataBaseEntryCreation",
+            "request": "launch",
+            "mainClass": "com.example.mariaDbForIcodic.DBO.DataBaseEntryCreation",
+            "projectName": "mariaDbForIcodic"
+        },
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "com.example.mariaDbForIcodic.DBO.test",
+            "projectName": "mariaDbForIcodic"
+        },
+        {
+            "type": "java",
+            "name": "MariaDbForIcodicApplication",
+            "request": "launch",
+            "mainClass": "com.example.mariaDbForIcodic.MariaDbForIcodicApplication",
+            "projectName": "mariaDbForIcodic"
+        },
+        {
+            "type": "java",
+            "name": "Application",
+            "request": "launch",
+            "mainClass": "cz.madeta.icoJasonParse.Application",
+            "projectName": "icoJasonParse"
+        },
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "cz.madeta.test",
+            "projectName": "icoJasonParse"
+        },
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "com.pernik.test",
+            "projectName": "icoJasonParse"
+        },
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "test",
+            "projectName": "icoJasonParse"
+        },
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "com.pernik.icoJasonParse.test",
+            "projectName": "icoJasonParse"
+        },
+        {
+            "type": "java",
+            "name": "Launch Java Program",
+            "request": "launch",
+            "mainClass": ""
+        },
+        {
+            "type": "java",
+            "name": "start",
+            "request": "launch",
+            "mainClass": "start",
+            "projectName": "icoJasonParse"
+        },
+        {
+            "command": "npm start",
+            "name": "Run npm start",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Open webForIcoInfo.html",
+            "file": "/home/pernik/webIcoInfo/icoJasonParse/src/main/resources/templates/webForIcoInfo.html"
+        }
+    ]
+}
