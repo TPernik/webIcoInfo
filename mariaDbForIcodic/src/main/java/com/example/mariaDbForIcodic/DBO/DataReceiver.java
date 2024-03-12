@@ -16,7 +16,8 @@ import com.example.mariaDbForIcodic.services.EntityServices;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDateTime;    
+import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.annotation.PostConstruct;
 
@@ -39,17 +40,16 @@ public class DataReceiver {
             ObjectMapper objectMapper = new ObjectMapper();
             EntityIcodic icodics = objectMapper.readValue(icodic, EntityIcodic.class);
             
-            //EntityServices service; // = new EntityServices(entityRepository);
-            
-            //service.saveEntity(icodics);
             String icodicString = icodics.getIcodic();
             String nameString = icodics.getName();
             var currentTime = LocalDateTime.now();
             EntityIcodic icodicname = new EntityIcodic(nameString, icodicString, currentTime);
+            //List<EntityIcodic> sameIcodic= entityServices.findEntitiesByIcodics(icodicString);
+            if(!entityServices.entityExists(icodicString)){
 
-            entityServices.createEntity(icodicname);
-
-            //entityRepository.save(new EntityIcodic(nameString, icodicString));
+                entityServices.createEntity(icodicname);
+            }
+            
         
     }
 }

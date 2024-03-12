@@ -39,17 +39,20 @@ public class EntityServices {
     }
     
     // Method to find entities by name
-    //public List<EntityIcodic> findEntitiesByName(String name) {
-    //    return entityRepository.findByName(name);
-    //}
-    //// Method to find entities by icodic
-    //public List<EntityIcodic> findEntitiesByIcodics(String icodic) {
-    //    return entityRepository.findByName(icodic);
-    //}
+    public List<EntityIcodic> findEntitiesByName(String name) {
+        return entityRepository.findByName(name);
+    }
+    // Method to find entities by icodic
+    public List<EntityIcodic> findEntitiesByIcodics(String icodic) {
+        return entityRepository.findByIcodic(icodic);
+    }
     public EntityIcodic saveEntity(@Valid @RequestBody EntityIcodic icodic) {
         return entityRepository.save(icodic);
     }
-
+    public boolean entityExists(String icodicString) {
+        List<EntityIcodic> entities = entityRepository.findByIcodic(icodicString);
+        return !entities.isEmpty();
+    }
     public Iterable<EntityIcodic> getAllEntities() {
         // TODO Auto-generated method stub
         return entityRepository.findAll();

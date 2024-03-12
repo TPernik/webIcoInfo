@@ -10,7 +10,7 @@ import com.example.mariaDbForIcodic.model.EntityIcodic;
 @Repository
 public interface EntityRepository extends JpaRepository<EntityIcodic, Long> {
    
-    //List<EntityIcodic> findByName(String name);
+    List<EntityIcodic> findByName(String name);
 
-    //List<EntityIcodic> findByIcodic(String icodic);
+    List<EntityIcodic> findByIcodic(String icodic);
 }
