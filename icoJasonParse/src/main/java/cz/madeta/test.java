@@ -23,13 +23,14 @@ public class test {
         
         //String dic = "24240478";
         //dic.add("09533702");
-        dic.add("63275635");
+        dic.add("05869072");
         //ico.add("63275635");
-        ico.add("26028891");
+        ico.add("29025745");
         //ico.add("63275635");
 
         //System.out.println(testControllerIco.fetchDataAres(ico));
-        System.out.println(testControllerIco.fetchDataAres(ico));
+        //System.out.println(testControllerIco.fetchDataAres(ico));
+        System.out.println(testControllerIco.fetchAdditionalInfoFor(dic));
     }
     
     

@@ -104,6 +104,7 @@ public class ControllerIco {
                         JSONObject JsonBody = new JSONObject();
                         JsonBody.put("name", nameDb);
                         JsonBody.put("icodic", icodicDb);
+                        JsonBody.put("unreliablePayer", "");
                         String JsonString = JsonBody.toString();
                     HttpClient clientDb = HttpClient.newHttpClient();
                     HttpRequest requestDB = HttpRequest.newBuilder()
@@ -292,11 +293,13 @@ public class ControllerIco {
                     if(dic.size() == 1){
                         String nameDb = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getString("nazevSubjektu");
                         int icodic = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getInt("dic");
+                        String unreliablePayer = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getString("nespolehlivyPlatce");
                         String icodicDb = String.valueOf(icodic);
 
                         JSONObject JsonBody = new JSONObject();
                         JsonBody.put("name", nameDb);
                         JsonBody.put("icodic", icodicDb);
+                        JsonBody.put("unreliablePayer", unreliablePayer);
                         String JsonString = JsonBody.toString();
                     HttpClient clientDb = HttpClient.newHttpClient();
                     HttpRequest requestDB = HttpRequest.newBuilder()
@@ -311,11 +314,13 @@ public class ControllerIco {
                     }else{
                         String nameDb = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getString("nazevSubjektu");
                         int icodic = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getInt("dic");
+                        String unreliablePayer = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getString("nespolehlivyPlatce");
                         String icodicDb = String.valueOf(icodic);
 
                         JSONObject JsonBody = new JSONObject();
                         JsonBody.put("name", nameDb);
                         JsonBody.put("icodic", icodicDb);
+                        JsonBody.put("ureliablePayer", unreliablePayer);
                         String JsonString = JsonBody.toString();
                     HttpClient clientDb = HttpClient.newHttpClient();
                     HttpRequest requestDB = HttpRequest.newBuilder()

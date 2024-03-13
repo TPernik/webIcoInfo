@@ -1,0 +1,16 @@
+package com.example.mariaDbForIcodic.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.example.mariaDbForIcodic.model.EntityIco;
+
+@Repository
+public interface EntityRepositoryIco extends JpaRepository<EntityIco, Long> {
+   
+    List<EntityIco> findByName(String name);
+
+    List<EntityIco> findByIcodic(String icodic);
+}
