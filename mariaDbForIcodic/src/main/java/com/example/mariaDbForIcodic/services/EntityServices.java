@@ -42,10 +42,18 @@ public class EntityServices {
     public List<EntityIcodic> findEntitiesByName(String name) {
         return entityRepository.findByName(name);
     }
+    //public EntityIcodic updateEntity(EntityIcodic updatedEntity){
+    //    if(entityRepository.existsById(updatedEntity.getId())){
+    //        return entityRepository.save(updatedEntity);
+    //    }else{
+    //        return null;
+    //    }
+    //}
     // Method to find entities by icodic
     public List<EntityIcodic> findEntitiesByIcodics(String icodic) {
         return entityRepository.findByIcodic(icodic);
     }
+    @SuppressWarnings("null")
     public EntityIcodic saveEntity(@Valid @RequestBody EntityIcodic icodic) {
         return entityRepository.save(icodic);
     }

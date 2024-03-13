@@ -15,7 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "icodic_tbl")
+@Table(name = "icodic_tbl2")
 //Data
 //AllArgsConstructor
 //NoArgsConstructor

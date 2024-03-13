@@ -3,6 +3,7 @@ package com.example.mariaDbForIcodic;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.example.mariaDbForIcodic.DBO.DataReceiver;
@@ -19,6 +20,10 @@ public class test {
         //List<String> dic = new ArrayList<String>();
 
         var icodic = "{\"name\": \"testtest\", \"icodic\": \"261684986\"}";
+        JSONObject Jsbody = new JSONObject();
+        Jsbody.put("icodic", "06608795");
+        Jsbody.put("name", "TEst");
+        String JsonString = Jsbody.toString();
         //String dic = "24240478";
         //dic.add("25836595");
         //dic.add("63275635");
@@ -26,7 +31,7 @@ public class test {
         ico.add("25836595");
         ico.add("63275635");
 
-        tesDataReceiver.receiveAndInsertData(icodic);
+        tesDataReceiver.receiveAndInsertData(JsonString);
         //System.out.println(testControllerIco.fetchAdditionalInfoForUnreliablePayer(dic));
     }
 }

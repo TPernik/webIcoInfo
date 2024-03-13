@@ -101,11 +101,15 @@ public class ControllerIco {
                         String icodicDb = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getString("ico");
                         String nameDb = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getString("obchodniJmeno");
                     
+                        JSONObject JsonBody = new JSONObject();
+                        JsonBody.put("name", nameDb);
+                        JsonBody.put("icodic", icodicDb);
+                        String JsonString = JsonBody.toString();
                     HttpClient clientDb = HttpClient.newHttpClient();
                     HttpRequest requestDB = HttpRequest.newBuilder()
                             .uri(URI.create(dbUrl))
                             .timeout(Duration.ofMillis(10000))
-                            .POST(HttpRequest.BodyPublishers.ofString("{\"name\": \"" + nameDb + "\", \"icodic\": \"" + icodicDb + "\"}"))
+                            .POST(HttpRequest.BodyPublishers.ofString(JsonString))
                             .setHeader("Content-Type", "application/json")
                             .setHeader("Accept", "application/json")
                             .build();
@@ -290,28 +294,37 @@ public class ControllerIco {
                         int icodic = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getInt("dic");
                         String icodicDb = String.valueOf(icodic);
 
-                        HttpClient clientDb = HttpClient.newHttpClient();
-                        HttpRequest requestDB = HttpRequest.newBuilder()
-                           .uri(URI.create(dbUrl))
-                           .timeout(Duration.ofMillis(10000))
-                           .POST(HttpRequest.BodyPublishers.ofString("{\"name\": \"" + nameDb + "\", \"icodic\": \"" + icodicDb + "\"}"))
-                           .setHeader("Content-Type", "application/json")
-                           .setHeader("Accept", "application/json")
-                           .build();
+                        JSONObject JsonBody = new JSONObject();
+                        JsonBody.put("name", nameDb);
+                        JsonBody.put("icodic", icodicDb);
+                        String JsonString = JsonBody.toString();
+                    HttpClient clientDb = HttpClient.newHttpClient();
+                    HttpRequest requestDB = HttpRequest.newBuilder()
+                            .uri(URI.create(dbUrl))
+                            .timeout(Duration.ofMillis(10000))
+                            .POST(HttpRequest.BodyPublishers.ofString(JsonString))
+                            .setHeader("Content-Type", "application/json")
+                            .setHeader("Accept", "application/json")
+                            .build();
                            CompletableFuture<HttpResponse<String>> dbResponse = clientDb.sendAsync(requestDB, HttpResponse.BodyHandlers.ofString());
+                           
                     }else{
                         String nameDb = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getString("nazevSubjektu");
                         int icodic = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getInt("dic");
                         String icodicDb = String.valueOf(icodic);
 
-                        HttpClient clientDb = HttpClient.newHttpClient();
-                        HttpRequest requestDB = HttpRequest.newBuilder()
-                           .uri(URI.create(dbUrl))
-                           .timeout(Duration.ofMillis(10000))
-                           .POST(HttpRequest.BodyPublishers.ofString("{\"name\": \"" + nameDb + "\", \"icodic\": \"" + icodicDb + "\"}"))
-                           .setHeader("Content-Type", "application/json")
-                           .setHeader("Accept", "application/json")
-                           .build();
+                        JSONObject JsonBody = new JSONObject();
+                        JsonBody.put("name", nameDb);
+                        JsonBody.put("icodic", icodicDb);
+                        String JsonString = JsonBody.toString();
+                    HttpClient clientDb = HttpClient.newHttpClient();
+                    HttpRequest requestDB = HttpRequest.newBuilder()
+                            .uri(URI.create(dbUrl))
+                            .timeout(Duration.ofMillis(10000))
+                            .POST(HttpRequest.BodyPublishers.ofString(JsonString))
+                            .setHeader("Content-Type", "application/json")
+                            .setHeader("Accept", "application/json")
+                            .build();
                            CompletableFuture<HttpResponse<String>> dbResponse = clientDb.sendAsync(requestDB, HttpResponse.BodyHandlers.ofString());
                     }
                
