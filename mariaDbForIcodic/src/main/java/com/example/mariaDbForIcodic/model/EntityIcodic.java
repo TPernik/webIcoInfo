@@ -1,24 +1,17 @@
 package com.example.mariaDbForIcodic.model;
 
-import java.sql.Date;
-
 import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;    
 import jakarta.persistence.Column;
-//import lombok.AllArgsConstructor;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+//entity that sets table and values for database this one gets either ico or dic as a param stores everything
 @Entity
 @Table(name = "icodic_tbl2")
-//Data
-//AllArgsConstructor
-//NoArgsConstructor
 public class EntityIcodic {
     
     private Long id;
@@ -37,7 +30,7 @@ public class EntityIcodic {
         this.updatedAt = updatedAt;
     }
 
-    //getters/setters
+//getters/setters
 
     @Id
     @Column(name = "Id", nullable = false)

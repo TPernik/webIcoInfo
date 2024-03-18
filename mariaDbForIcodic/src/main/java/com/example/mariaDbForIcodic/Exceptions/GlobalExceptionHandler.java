@@ -1,6 +1,5 @@
 package com.example.mariaDbForIcodic.Exceptions;
 
-
 import java.util.Date;
 
 import org.springframework.http.HttpStatus;

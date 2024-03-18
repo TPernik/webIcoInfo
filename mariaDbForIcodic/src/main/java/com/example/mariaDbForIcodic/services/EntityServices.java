@@ -1,7 +1,8 @@
 package com.example.mariaDbForIcodic.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
-//import org.hibernate.mapping.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import com.example.mariaDbForIcodic.repository.EntityRepositoryIco;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 
+//service for manipulating entities uses repo CRUD methods 
 @Service
 public class EntityServices {
 
@@ -29,19 +31,14 @@ public class EntityServices {
         this.entityRepositoryIco = entityRepositoryIco;
         this.entityRepositoryDic = entityRepositoryDic;
     }
-//icodic
+//icodic    
+    //Creates entry in DB
     public EntityIcodic createEntity(EntityIcodic icodic){
         return entityRepository.save(icodic);
     }
-
-    //public void processDataAndSaveToDatabase(String name, String icodic, LocalTime) {
-    //    
-    //        EntityIcodic entity = new EntityIcodic(name, icodic);
-    //        entityRepository.save(entity);
-    //    
-    //}
-
-     @PostConstruct
+    
+    //basically useless but i like it
+    @PostConstruct
     public void postConstruct() {
         System.out.println("EntityServices bean has been created!");
     }
@@ -50,63 +47,107 @@ public class EntityServices {
     public List<EntityIcodic> findEntitiesByName(String name) {
         return entityRepository.findByName(name);
     }
-    public EntityIcodic updateEntity(EntityIcodic updatedEntity){
-        if(entityRepository.existsById(updatedEntity.getId())){
-            return entityRepository.save(updatedEntity);
-        }else{
-            return null;
+
+    //updates entry in DB
+    public EntityIcodic updateEntity(String icodic, EntityIcodic icodicname){
+     
+        List<EntityIcodic> entities = entityRepository.findByIcodic(icodic);
+
+        if(!entities.isEmpty()){
+            
+            for (EntityIcodic existingIcodic: entities){
+
+                existingIcodic.setId(existingIcodic.getId());
+                existingIcodic.setUpdatedAt(LocalDateTime.now());
+                existingIcodic.setIcodic(icodic);
+                existingIcodic.setName(icodicname.getName());
+
+                return entityRepository.save(existingIcodic);
+            }
+            
         }
+        return entityRepository.save(null);
+
     }
+
     // Method to find entities by icodic
     public List<EntityIcodic> findEntitiesByIcodics(String icodic) {
         return entityRepository.findByIcodic(icodic);
     }
-    @SuppressWarnings("null")
+    //useless
     public EntityIcodic saveEntity(@Valid @RequestBody EntityIcodic icodic) {
         return entityRepository.save(icodic);
     }
+
+    //finds if entry already exists
     public boolean entityExists(String icodicString) {
         List<EntityIcodic> entities = entityRepository.findByIcodic(icodicString);
         return !entities.isEmpty();
     }
-    public Iterable<EntityIcodic> getAllEntities() {
+    
+    //not in use rn
+    public List<EntityIcodic> getAllEntities() {
         // TODO Auto-generated method stub
         return entityRepository.findAll();
     }
 //ico
+    //creates entry in ico DB
     public EntityIco createEntityIco(EntityIco icodicname){
         return entityRepositoryIco.save(icodicname);
     }
+
     // Method to find entities by name
     public List<EntityIco> findEntitiesByNameIco(String name) {
         return entityRepositoryIco.findByName(name);
     }
-    public EntityIco updateEntityIco(EntityIco updatedEntityIco){
-        if(entityRepositoryIco.existsById(updatedEntityIco.getId())){
-            return entityRepositoryIco.save(updatedEntityIco);
-        }else{
-            return null;
+
+    //updates already existing ico DB entry
+    public EntityIco updateEntityIco(String icodic, EntityIco updatedEntityIco){
+     
+        List<EntityIco> entities = entityRepositoryIco.findByIcodic(icodic);
+
+        if(!entities.isEmpty()){
+            
+            for (EntityIco existingIco: entities){
+
+                existingIco.setId(existingIco.getId());
+                existingIco.setUpdatedAt(LocalDateTime.now());
+                existingIco.setIcodic(icodic);
+                existingIco.setName(updatedEntityIco.getName());
+
+                return entityRepositoryIco.save(existingIco);
+            }
+            
         }
+        return entityRepositoryIco.save(null);
+
     }
     // Method to find entities by ico
     public List<EntityIco> findEntitiesByIco(String icodic) {
         return entityRepositoryIco.findByIcodic(icodic);
     }
+    
+    //useless
     @SuppressWarnings("null")
     public EntityIco saveEntityIco(@Valid @RequestBody EntityIco icodic) {
         return entityRepositoryIco.save(icodic);
     }
+
+    //find if entry already exists in Ico DB 
     public boolean entityExistsIco(String icodicString) {
         List<EntityIco> entities = entityRepositoryIco.findByIcodic(icodicString);
         return !entities.isEmpty();
     }
-    public Iterable<EntityIco> getAllEntitiesIco() {
+
+    //not using rn
+    public List<EntityIco> getAllEntitiesIco() {
         // TODO Auto-generated method stub
         return entityRepositoryIco.findAll();
     }
 
 //dic
 
+    //creates dic DB entry 
      public EntityDic createEntityDic(EntityDic icodic){
         return entityRepositoryDic.save(icodic);
     }
@@ -114,27 +155,47 @@ public class EntityServices {
     public List<EntityDic> findEntitiesByNameDic(String name) {
         return entityRepositoryDic.findByName(name);
     }
-    public EntityDic updateEntityDic(EntityDic updatedEntityDic){
-        if(entityRepositoryDic.existsById(updatedEntityDic.getId())){
-            return entityRepositoryDic.save(updatedEntityDic);
-        }else{
-            return null;
+
+    //updates entry if it already exists in dic DB
+    public EntityDic updateEntityDic(String icodic, EntityDic updatedEntityDic){
+     
+        List<EntityDic> entities = entityRepositoryDic.findByIcodic(icodic);
+
+        if(!entities.isEmpty()){
+            
+            for (EntityDic existingDic : entities){
+
+                existingDic.setId(existingDic.getId());
+                existingDic.setUpdatedAt(LocalDateTime.now());
+                existingDic.setUnreliablePayer(updatedEntityDic.unreliablePayer);
+                existingDic.setIcodic(icodic);
+                existingDic.setName(updatedEntityDic.getName());
+
+                return entityRepositoryDic.save(existingDic);
+            }
+            
         }
+        return entityRepositoryDic.save(null);
+
     }
     // Method to find entities by dic
     public List<EntityDic> findEntitiesByDic(String icodic) {
         return entityRepositoryDic.findByIcodic(icodic);
     }
-    @SuppressWarnings("null")
+    
+    //useless
     public EntityDic saveEntityDic(@Valid @RequestBody EntityDic icodic) {
         return entityRepositoryDic.save(icodic);
     }
+
+    //find out if entry based on this dic exists in dic DB
     public boolean entityExistsDic(String icodicString) {
         List<EntityDic> entities = entityRepositoryDic.findByIcodic(icodicString);
         return !entities.isEmpty();
     }
-    public Iterable<EntityDic> getAllEntitiesDic() {
-        // TODO Auto-generated method stub
+
+    //Not using rn
+    public List<EntityDic> getAllEntitiesDic() {
         return entityRepositoryDic.findAll();
     }
 

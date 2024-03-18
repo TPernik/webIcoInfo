@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.mariaDbForIcodic.model.EntityIcodic;
 
+//repository for all purpose icodic databaSse uses CRUD from JpaRepository has additional method for finding by certain values
 @Repository
 public interface EntityRepository extends JpaRepository<EntityIcodic, Long> {
    

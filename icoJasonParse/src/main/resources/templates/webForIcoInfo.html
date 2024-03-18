@@ -80,51 +80,219 @@
             margin-right: 15em;
             z-index: -1;
         }
+        .content {
+            display: none;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
-    
-    <div class="topnav">
-        <a class="active" href="#ARES/DPH">ARES/DPH</a>
-        <a href="#test1">Test1</a>
-        <a href="#test2">Test2</a>
-        <a href="#test3">Test3</a>
-        
-        <div class="slidebar">
+    <header>  
+        <div class="topnav">
+            <a class="active" href="#ARES/DPH">ARES/DPH</a>
+            <a href="#ICO">ARES data</a>
+            <a href="#DIC">DPH data</a>
+            <a href="#ICODIC">Data table</a>
 
-            <a>:</a>
+            <div class="slidebar">
+
+                <a>:</a>
+            </div>
+
         </div>
-        
-    </div>
-        
-    <br>
-    <br>
-    <br>
-    <div class="fixed">
+    </header>      
+    <div id="ARES/DPH" class="content" style="display: block;">
+        <br>
+        <br>
 
-        <form action=""></form>
-        <input type="text" id="icoInput" name="icoInput">
-        
-        <button class="ui-button" onclick="createAresTextBox(); false;">ARES</button>
-        <button class="ui-button" onclick="createDphRegisterextBox(); false;">DPH Register</button>
-        
-    </div> 
+        <div class="fixed">
 
-    <br>
-    <div class="img-logo" id="imgContainer">
-        <img src="http://localhost:8080/resources/madeta_logo.png" alt="madeta logo">
+            <form action=""></form>
+            <input type="text" id="icoInput" name="icoInput">
+
+            <button class="ui-button" onclick="createAresTextBox(); false;">ARES</button>
+            <button class="ui-button" onclick="createDphRegisterextBox(); false;">DPH Register</button>
+
+        </div> 
+
+        <br>
+        <div class="img-logo" id="imgContainer">
+            <img src="http://localhost:8080/resources/madeta_logo.png" alt="madeta logo">
+        </div>
+        <div class="display-textContainer" id="textBoxContainer"></div>
+        <div class="display-textContainer" id="textBoxContainer2"></div>
     </div>
-    <div class="display-textContainer" id="textBoxContainer"></div>
-    <div class="display-textContainer" id="textBoxContainer2"></div>
-    
+
+    <div id="ICO" class="content">
+
+        <div>
+            <table id="dataTableIco" class="md-tableError">
+                <thead>
+                    <br>
+                    <br>
+                    
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>ico</th>
+                        <th>updatedAt</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyIco">
+
+                </tbody>
+
+            </table>
+        </div>
+        <div class="img-logo" id="imgContainer">
+            <img src="http://localhost:8080/resources/madeta_logo.png" alt="madeta logo">
+        </div>
+    </div>
+
+    <div id="DIC" class="content">
+        <div>
+            <table id="dataTableDic" class="md-tableWarning">
+                <thead>
+                    <br>
+                    <br>
+                    
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>dic</th>
+                        <th>unreliablePayer</th>
+                        <th>updatedAt</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyDic">
+
+                </tbody>
+
+            </table>
+        </div>
+        <div class="img-logo" id="imgContainer">
+            <img src="http://localhost:8080/resources/madeta_logo.png" alt="madeta logo">
+        </div>
+
+    </div>
+
+    <div id="ICODIC" class="content">
+        <div>
+            <table id="dataTableIcodic" class="md-tableView">
+                <thead>
+                    <br>
+                    <br>
+                    
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>icodic</th>
+                        <th>updatedAt</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBodyIcodic">
+
+                </tbody>
+
+            </table>
+        </div>
+        <div class="img-logo" id="imgContainer">
+            <img src="http://localhost:8080/resources/madeta_logo.png" alt="madeta logo">
+        </div>
+
+    </div>
 
     <script>
+//data table for ico DB
+        async function fetchBDIco(){
+            const response = await fetch('http://localhost:8080/mariaDbForIcodic-0.0.1-SNAPSHOT/fetchBDIco')
+            const data = await response.json();
+            return data;
+        }
+
+        async function populateTableIco(){
+            const data = await fetchBDIco();
+            const tableBodyIco = document.getElementById('tableBodyIco')
+
+            tableBodyIco.innerHTML = '';
+
+            data.forEach(item => {
+                const row = '<tr><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.updatedAt + '</td></tr>';
+                tableBodyIco.innerHTML += row;
+            });
+        }
+//data table for dic DB
+        async function fetchBDDic(){
+            const response = await fetch('http://localhost:8080/mariaDbForIcodic-0.0.1-SNAPSHOT/fetchBDDic')
+            const data = await response.json();
+            return data;
+        }
+
+        async function populateTableDic(){
+            const data = await fetchBDDic();
+            const tableBodyDic = document.getElementById('tableBodyDic')
+
+            tableBodyDic.innerHTML = '';
+
+            data.forEach(item => {
+                const row = '<tr><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.unreliablePayer + '</td><td>' + item.updatedAt + '</td></tr>';
+                tableBodyDic.innerHTML += row;
+            });
+        }
+//data table for icodic
+async function fetchBDIcodic(){
+            const response = await fetch('http://localhost:8080/mariaDbForIcodic-0.0.1-SNAPSHOT/fetchBDIcodic')
+            const data = await response.json();
+            return data;
+        }
+
+        async function populateTableIcodic(){
+            const data = await fetchBDIcodic();
+            const tableBodyIcodic = document.getElementById('tableBodyIcodic')
+
+            tableBodyIcodic.innerHTML = '';
+
+            data.forEach(item => {
+                const row = '<tr><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.updatedAt + '</td></tr>';
+                tableBodyIcodic.innerHTML += row;
+            });
+        }
+        window.onload = () => {
+            populateTableIco();
+            populateTableDic();
+            populateTableIcodic();
+        };
+        
+        document.addEventListener("DOMContentLoaded", function() {
+        var tabs = document.querySelectorAll('.topnav a');
+
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var targetId = this.getAttribute('href').substring(1);
+                    var contents = document.querySelectorAll('.content');
+                
+                    contents.forEach(function(content) {
+                        if (content.id === targetId) {
+                            content.style.display = 'block';
+                        } else {
+                            content.style.display = 'none';
+                        }
+                    });
+
+                    tabs.forEach(function(tab) {
+                        tab.classList.remove('active');
+                    });
+
+                    this.classList.add('active');
+                });
+            });
+        });
         
         function createAresTextBox() {   
 
             var inputData = document.getElementById("icoInput").value;
             var dicValues = inputData.split(',').map(value => value.trim());
-            //inputData = parseInt(inputData, 10)
             var jsonData = JSON.stringify(dicValues);
 
             console.log(inputData)
@@ -163,7 +331,6 @@
                             }
                         }
                         textContainer.appendChild(document.createElement("hr"));
-                   
                      });
                     
                 }
@@ -173,10 +340,8 @@
             });                
         }      
         function createDphRegisterextBox(){
-            //window.addEventListener("DOMContentLoaded", () => {
             var inputData = document.getElementById("icoInput").value;
             var dicValues = inputData.split(',').map(value => value.trim());
-            //inputData = parseInt(inputData, 10)
             var jsonData = JSON.stringify(dicValues);
 
             console.log(inputData)
@@ -196,7 +361,6 @@
                 if (fetch_status == 200){
                     var textContainer = document.getElementById("textBoxContainer2");
                     var data;
-                    //textContainer.appendChild(document.createElement("hr"));
                     dics = inputData;
                     showMoreInfoOnUnreliablePayer(dics)
                     
@@ -213,7 +377,6 @@
             
             var inputData = document.getElementById("icoInput").value;
             var dicValues = inputData.split(',').map(value => value.trim());
-            //inputData = parseInt(inputData, 10)
             jsontData = JSON.stringify(dicValues);
 
             fetch('http://localhost:8080/icoJasonParse-0.0.1-SNAPSHOT/fetchAdditionalInfoFor' , {
@@ -258,7 +421,6 @@
                 if(obj.hasOwnProperty(key)){
                     if(typeof obj[key] === 'object' && obj[key] !== null){
                         iterateObject(obj[key], depth + 1);
-                        //textContainer.appendChild(document.createElement("hr"));
                     }else{
                         console.log("else")
                         if(key === "datumZverejneni"){
@@ -287,23 +449,8 @@
                         textBox.readOnly = true;
                         textBox.value = obj[key];
                         
-                        //var currentDic;
-                        //        if (key ==="dic"){
-                        //            currentDic = obj[key];
-                        //        }
-                        
                         textContainer.appendChild(label);
                         textContainer.appendChild(textBox);
-                        
-                        //if(key === "nespolehlivyPlatce" ){
-                        //            var unreliebleInfoButton = document.createElement("BUTTON");
-                        //            unreliebleInfoButton.innerHTML = "moreInfo";
-                        //            console.log(currentDic)
-                        //            textContainer.appendChild(unreliebleInfoButton);
-                        //            unreliebleInfoButton.addEventListener("click", function() {
-                        //                    showMoreInfoOnUnreliablePayer(currentDic);
-                        //            });
-                        //        }
 
                         textContainer.appendChild(document.createElement("br"));
                         

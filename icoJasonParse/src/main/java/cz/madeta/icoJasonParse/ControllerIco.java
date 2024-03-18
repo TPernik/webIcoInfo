@@ -117,13 +117,6 @@ public class ControllerIco {
 
                             CompletableFuture<HttpResponse<String>> dbResponse = clientDb.sendAsync(requestDB, HttpResponse.BodyHandlers.ofString());
                             
-                        //entityServices.processDataAndSaveToDatabase(nameDb, icoDb);
-                        //EntityIcodic entityIcodic = new EntityIcodic();
-                        
-                        //entityIcodic.setName(nameDb);
-                        //entityIcodic.setIcodic(icoDb);
-                        //this.entityRepository.save(entityIcodic);
-                        //System.out.println(entityIcodic.getName());
                     }
                     return "" + data;
 
@@ -198,7 +191,6 @@ public class ControllerIco {
 
                                 data.put("nespolehlivyPlatce", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getString("nespolehlivyPlatce"));
                                 data.put("cisloFu", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getInt("cisloFu"));
-                                //data.put("datumZverejneniNespolehlivosti", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getString("datumZverejneniNespolehlivosti"));
                                 data.put("dic", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getInt("dic"));
                                 data.put("status", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONObject("status").getString("statusText"));
                                 
@@ -217,13 +209,9 @@ public class ControllerIco {
 
                             objDph.put("nespolehlivyPlatce", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONObject("statusPlatceDPH").getString("nespolehlivyPlatce"));
                             objDph.put("cisloFu", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONObject("statusPlatceDPH").getInt("cisloFu"));
-                            //objDph.put("datumZverejneniNespolehlivosti", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONObject("statusPlatceDPH").getString("datumZverejneniNespolehlivosti"));
                             objDph.put("dic", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONObject("statusPlatceDPH").getInt("dic"));
                             objDph.put("status", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONObject("status").getString("statusText"));
-                            
 
-                         
-                            //objDph.append("allData", allObject);
                         }
                         return "" + allObject;
 
@@ -235,19 +223,19 @@ public class ControllerIco {
 
             return "true";
         }
+
+        //this method is being called simultaneously with fetchDPHStatus and gives additional data
         @PostMapping(value = "/fetchAdditionalInfoFor")
         public String fetchAdditionalInfoFor(@RequestBody List<String> dic) {
         
             String url = "https://adisrws.mfcr.cz/dpr/axis2/services/rozhraniCRPDPH.rozhraniCRPDPHSOAP";
             String dbUrl = "http://localhost:8080/mariaDbForIcodic-0.0.1-SNAPSHOT/icodicDbAdd";
 
-            //String getStatus [] = {"getStatusNespolehlivyPlatceRozsireny", "getStatusNespolehlivyPlatce"};
-            //String getStatusReponse [] = {"StatusNespolehlivyPlatceRozsirenyResponse", "StatusNespolehlivyPlatceResponse"};
-
             Set<String> dics = new HashSet<>(dic);
             JSONObject allObject = new JSONObject();
             JSONObject addObjects = new JSONObject();
 
+            //this creates a SOAP xml format
             StringBuilder soapXmBuilder = new StringBuilder();
             
             soapXmBuilder.append("<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">\n");
@@ -273,17 +261,12 @@ public class ControllerIco {
                 .build();
             
             CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+
              try {
                 String responseBody = response.thenApply(HttpResponse::body).get();
                 JSONObject jsonObject = XML.toJSONObject(responseBody);
                 allObject.put("data", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse"));
-                //addObjects.put("addr", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getJSONObject("adresa"));
-                
-                //int accSize = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getJSONObject("zverejneneUcty").getJSONArray("ucet").length();          
-                //for(int i = 0; i <= accSize - 1; i++){
-
-                //    addObjects.put("acc", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getJSONObject("zverejneneUcty").getJSONArray("ucet").getJSONObject(i));
-                //}
+         
                 allObject.remove("xmlns");
                 allObject.remove("statusText");
                 allObject.remove("statusCode");
@@ -296,13 +279,14 @@ public class ControllerIco {
                         String unreliablePayer = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getString("nespolehlivyPlatce");
                         String icodicDb = String.valueOf(icodic);
 
+                        //this calls the DB RESTapi and POSTs data for entries
                         JSONObject JsonBody = new JSONObject();
                         JsonBody.put("name", nameDb);
                         JsonBody.put("icodic", icodicDb);
                         JsonBody.put("unreliablePayer", unreliablePayer);
                         String JsonString = JsonBody.toString();
-                    HttpClient clientDb = HttpClient.newHttpClient();
-                    HttpRequest requestDB = HttpRequest.newBuilder()
+                        HttpClient clientDb = HttpClient.newHttpClient();
+                        HttpRequest requestDB = HttpRequest.newBuilder()
                             .uri(URI.create(dbUrl))
                             .timeout(Duration.ofMillis(10000))
                             .POST(HttpRequest.BodyPublishers.ofString(JsonString))
@@ -317,13 +301,14 @@ public class ControllerIco {
                         String unreliablePayer = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getString("nespolehlivyPlatce");
                         String icodicDb = String.valueOf(icodic);
 
+                        //this calls the DB RESTapi and POSTs data for entries
                         JSONObject JsonBody = new JSONObject();
                         JsonBody.put("name", nameDb);
                         JsonBody.put("icodic", icodicDb);
-                        JsonBody.put("ureliablePayer", unreliablePayer);
+                        JsonBody.put("unreliablePayer", unreliablePayer);
                         String JsonString = JsonBody.toString();
-                    HttpClient clientDb = HttpClient.newHttpClient();
-                    HttpRequest requestDB = HttpRequest.newBuilder()
+                        HttpClient clientDb = HttpClient.newHttpClient();
+                        HttpRequest requestDB = HttpRequest.newBuilder()
                             .uri(URI.create(dbUrl))
                             .timeout(Duration.ofMillis(10000))
                             .POST(HttpRequest.BodyPublishers.ofString(JsonString))
@@ -333,8 +318,6 @@ public class ControllerIco {
                            CompletableFuture<HttpResponse<String>> dbResponse = clientDb.sendAsync(requestDB, HttpResponse.BodyHandlers.ofString());
                     }
                
-
-          
                 }
 
                 return "" + allObject;

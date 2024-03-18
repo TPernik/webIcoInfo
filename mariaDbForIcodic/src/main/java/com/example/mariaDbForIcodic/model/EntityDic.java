@@ -1,24 +1,17 @@
 package com.example.mariaDbForIcodic.model;
 
-import java.sql.Date;
-
 import org.springframework.data.annotation.LastModifiedDate;
 import java.time.LocalDateTime;    
 import jakarta.persistence.Column;
-//import lombok.AllArgsConstructor;
-//import lombok.Data;
-//import lombok.NoArgsConstructor;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+//entity that sets table and values for database this one gets dic as a param and stores additional value in form of unreliablePayer
 @Entity
 @Table(name = "dic_tbl")
-//Data
-//AllArgsConstructor
-//NoArgsConstructor
 public class EntityDic {
     
     private Long id;
@@ -40,7 +33,7 @@ public class EntityDic {
 
     }
 
-    //getters/setters
+//getters/setters
 
     @Id
     @Column(name = "Id", nullable = false)

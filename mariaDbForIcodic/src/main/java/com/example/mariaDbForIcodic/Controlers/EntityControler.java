@@ -20,54 +20,55 @@ import com.example.mariaDbForIcodic.Exceptions.*;
 import com.example.mariaDbForIcodic.model.EntityIcodic;
 import com.example.mariaDbForIcodic.repository.EntityRepository;
 import com.example.mariaDbForIcodic.services.EntityServices;;
-
-@RestController
-@RequestMapping("/api/v1")
-public class EntityControler {
-
-    @Autowired
-    private EntityRepository entityRepository;
-
-    @GetMapping("/icodic")
-    public List< EntityIcodic >getAllEntities(){
-        return entityRepository.findAll();
-    }
-
-    @GetMapping("/icodic/{id}")
-    public ResponseEntity <EntityIcodic> getEntityicodicById(@PathVariable(value = "id") Long entityIcodicId)
-    throws ResourceNotFoundException{
-        EntityIcodic entityIcodic = entityRepository.findById(entityIcodicId)
-            .orElseThrow(() -> new ResourceNotFoundException("Ico or Dic not found for this id ::" + entityIcodicId));
-            return ResponseEntity.ok().body(entityIcodic);
-    }
-
-    @PostMapping("/icodic")
-    public EntityIcodic createEntityIcodic(@Valid @RequestBody EntityIcodic entityIcodic){
-        return entityRepository.save(entityIcodic);
-    }
-
-    @PutMapping("/icodic/{id}")
-    public ResponseEntity <EntityIcodic> updateEntityIcodic(@PathVariable(value = "id") Long entityIcodicId,
-        @Valid @RequestBody EntityIcodic entityIcodicDetails)throws ResourceNotFoundException{
-            EntityIcodic entityIcodic = entityRepository.findById(entityIcodicId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ico or Dic not found for this id ::" + entityIcodicId));
-            
-            entityIcodic.setIcodic(entityIcodicDetails.getIcodic());
-            entityIcodic.setName(entityIcodicDetails.getName());
-            final EntityIcodic updatedEntityIcodic = entityRepository.save(entityIcodic);
-            return ResponseEntity.ok(updatedEntityIcodic);
-        }
-    
-    @DeleteMapping("/icodic/{id}")
-    public Map <String, Boolean> deleteEntityIcodic(@PathVariable(value = "id") Long entityIcodicId)
-    throws ResourceNotFoundException{
-        EntityIcodic entityIcodic = entityRepository.findById(entityIcodicId)
-            .orElseThrow(() -> new ResourceNotFoundException("Ico or Dic not found for this id ::" + entityIcodicId));
-
-        entityRepository.delete(entityIcodic);
-        Map <String, Boolean> response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return response;
-    }
-    
-}
+//
+//@RestController
+//@RequestMapping("/api/v1")
+//public class EntityControler {
+//
+//    @Autowired
+//    private EntityRepository entityRepository;
+//
+//    @GetMapping("/icodic")
+//    public List< EntityIcodic >getAllEntities(){
+//        return entityRepository.findAll();
+//    }
+//
+//    @GetMapping("/icodic/{id}")
+//    public ResponseEntity <EntityIcodic> getEntityicodicById(@PathVariable(value = "id") Long entityIcodicId)
+//    throws ResourceNotFoundException{
+//        EntityIcodic entityIcodic = entityRepository.findById(entityIcodicId)
+//            .orElseThrow(() -> new ResourceNotFoundException("Ico or Dic not found for this id ::" + entityIcodicId));
+//            return ResponseEntity.ok().body(entityIcodic);
+//    }
+//
+//    @PostMapping("/icodic")
+//    public EntityIcodic createEntityIcodic(@Valid @RequestBody EntityIcodic entityIcodic){
+//        return entityRepository.save(entityIcodic);
+//    }
+//
+//    @PutMapping("/icodic/{id}")
+//    public ResponseEntity <EntityIcodic> updateEntityIcodic(@PathVariable(value = "id") Long entityIcodicId,
+//        @Valid @RequestBody EntityIcodic entityIcodicDetails)throws ResourceNotFoundException{
+//            EntityIcodic entityIcodic = entityRepository.findById(entityIcodicId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Ico or Dic not found for this id ::" + entityIcodicId));
+//            
+//            entityIcodic.setIcodic(entityIcodicDetails.getIcodic());
+//            entityIcodic.setName(entityIcodicDetails.getName());
+//            final EntityIcodic updatedEntityIcodic = entityRepository.save(entityIcodic);
+//            return ResponseEntity.ok(updatedEntityIcodic);
+//        }
+//    
+//    @DeleteMapping("/icodic/{id}")
+//    public Map <String, Boolean> deleteEntityIcodic(@PathVariable(value = "id") Long entityIcodicId)
+//    throws ResourceNotFoundException{
+//        EntityIcodic entityIcodic = entityRepository.findById(entityIcodicId)
+//            .orElseThrow(() -> new ResourceNotFoundException("Ico or Dic not found for this id ::" + entityIcodicId));
+//
+//        entityRepository.delete(entityIcodic);
+//        Map <String, Boolean> response = new HashMap<>();
+//        response.put("deleted", Boolean.TRUE);
+//        return response;
+//    }
+//    
+//}
+//

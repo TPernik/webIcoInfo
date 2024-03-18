@@ -19,7 +19,7 @@ public class test {
         List<String> ico = new ArrayList<String>();
         //List<String> dic = new ArrayList<String>();
 
-        var icodic = "{\"name\": \"testtest\", \"icodic\": \"261684986\"}";
+        //var icodic = "{\"name\": \"testtest\", \"icodic\": \"261684986\"}";
         JSONObject Jsbody = new JSONObject();
         Jsbody.put("icodic", "06608795");
         Jsbody.put("name", "TEst");
