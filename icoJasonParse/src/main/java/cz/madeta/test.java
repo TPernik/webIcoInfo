@@ -22,9 +22,9 @@ public class test {
         
         //String dic = "24240478";
         //dic.add("09533702");
-        dic.add("61498483");
+        dic.add("5706210818");
         //ico.add("63275635");
-        ico.add("29025745");
+        ico.add("69696420");
         //ico.add("63275635");
 
         //System.out.println(testControllerIco.fetchDataAres(ico));

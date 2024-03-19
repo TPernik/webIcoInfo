@@ -281,6 +281,11 @@ public class ControllerIco {
                             icodic = (int) dicObject;
                             String icodicDb = String.valueOf(icodic);
                             JsonBody.put("icodic", icodicDb);
+                        }else if(dicObject instanceof Long){
+                            Long icodic;
+                            icodic = (Long) dicObject;
+                            String icodicDb = String.valueOf(icodic);
+                            JsonBody.put("icodic", icodicDb);
                         }else if(dicObject instanceof String){
                             String icodicDb;
                             icodicDb = (String) dicObject;
