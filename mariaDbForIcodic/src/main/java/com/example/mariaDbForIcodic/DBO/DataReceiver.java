@@ -1,6 +1,9 @@
 package com.example.mariaDbForIcodic.DBO;
 
+import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,8 +41,7 @@ public class DataReceiver {
             ObjectMapper objectMapper = new ObjectMapper();
             EntityDic icodics = objectMapper.readValue(icodic, EntityDic.class);
             //EntityIco icos = objectMapper.readValue(icodic, EntityIco.class);
-            //EntityDic dics = objectMapper.readValue(icodic, EntityDic.class);
-
+            //EntityDic dics = objectMapper.readValue(icodic, EntityDic.class);            
             
             String icodicString = icodics.getIcodic();
             String nameString = icodics.getName();
@@ -49,10 +51,7 @@ public class DataReceiver {
             EntityIco icodicnameIco = new EntityIco(nameString, icodicString, currentTime);
             
             EntityDic icodicnameDic;
-            if(unreliablePayer == null){
-                unreliablePayer = "";
-                //icodicnameDic = new EntityDic(nameString, icodicString, currentTime, unreliablePayer);
-            }else{
+            if(icodics.unreliablePayer != "" ){
                 icodicnameDic = new EntityDic(nameString, icodicString, currentTime, unreliablePayer);
 
                 if(!entityServices.entityExistsDic(icodicString)){
@@ -61,27 +60,23 @@ public class DataReceiver {
                 }else{
                     entityServices.updateEntityDic(icodicString, icodicnameDic);
                 }
+            }else{
+                
+                if(!entityServices.entityExistsIco(icodicString)){
+
+                    entityServices.createEntityIco(icodicnameIco);
+                }else{
+                    entityServices.updateEntityIco(icodicString, icodicnameIco);
+                }
+                
             }
-            
-            
-            //List<EntityIcodic> sameIcodic= entityServices.findEntitiesByIcodics(icodicString);
             if(!entityServices.entityExists(icodicString)){
 
                 entityServices.createEntity(icodicname);
             }else{
                 entityServices.updateEntity(icodicString, icodicname);
             }
-
-            if(!entityServices.entityExistsIco(icodicString)){
-
-                entityServices.createEntityIco(icodicnameIco);
-            }else{
-                entityServices.updateEntityIco(icodicString, icodicnameIco);
-            }
-
-           
             
-        
     }
     @GetMapping(value = "/fetchBDDic")
     public List<EntityDic> fetchBDDic(){

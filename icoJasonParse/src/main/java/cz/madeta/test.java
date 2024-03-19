@@ -22,7 +22,7 @@ public class test {
         
         //String dic = "24240478";
         //dic.add("09533702");
-        dic.add("08544484");
+        dic.add("61498483");
         //ico.add("63275635");
         ico.add("29025745");
         //ico.add("63275635");

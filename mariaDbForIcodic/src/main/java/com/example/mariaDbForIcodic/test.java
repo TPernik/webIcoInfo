@@ -24,6 +24,8 @@ public class test {
         Jsbody.put("icodic", "06608795");
         Jsbody.put("name", "TEst");
         Jsbody.put("unreliablePayer", "Ano");
+        //Jsbody.put("dicKey", true);
+        //Jsbody.put("icoKey", false);
         String JsonString = Jsbody.toString();
         //String dic = "24240478";
         //dic.add("25836595");

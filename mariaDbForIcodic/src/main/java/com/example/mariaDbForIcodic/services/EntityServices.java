@@ -2,8 +2,10 @@ package com.example.mariaDbForIcodic.services;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -199,4 +201,33 @@ public class EntityServices {
         return entityRepositoryDic.findAll();
     }
 
+    //86400000
+    @Scheduled(fixedRate = 86400000)
+    public void updateDatabaseDic(){
+        List<EntityDic> entities = entityRepositoryDic.findAll();
+        for (EntityDic entityDic : entities) {
+            LocalDateTime entityDateTime = entityDic.getUpdatedAt();
+            LocalDateTime currDateTime = LocalDateTime.now();
+
+            Duration duration = Duration.between(entityDateTime, currDateTime);
+            long difference = duration.toDays();
+            if(difference > 7){
+                entityRepositoryDic.deleteById(entityDic.getId());
+            }
+        }
+    }
+    @Scheduled(fixedRate = 86400000)
+    public void updateDatabaseIco(){
+        List<EntityIco> entities = entityRepositoryIco.findAll();
+        for (EntityIco entityIco : entities) {
+            LocalDateTime entityDateTime = entityIco.getUpdatedAt();
+            LocalDateTime currDateTime = LocalDateTime.now();
+
+            Duration duration = Duration.between(entityDateTime, currDateTime);
+            long difference = duration.toDays();
+            if(difference > 7){
+                entityRepositoryIco.deleteById(entityIco.getId());
+            }
+        }
+    }
 } 

@@ -63,23 +63,23 @@ public class ControllerIco {
                 for(int i = 0; i <= moreEntries - 1; i++){
                     JSONObject objares = new JSONObject();
                     
-                        allObject.put("data", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i));
+                    allObject.put("data", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i));
                     
-                        objares.put("name", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getString("obchodniJmeno"));
-                        objares.put("ico", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getString("ico"));
-                        String dic = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).optString("dic", "-1");
-                        dic = dic.replaceAll("-1", "");
-                        objares.put("dic", dic);
-                        objares.put("country", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").getString("nazevStatu"));
+                    objares.put("name", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).optString("obchodniJmeno", "-1"));
+                    objares.put("ico", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).optString("ico", "-1"));
+                    String dic = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).optString("dic", "-1");
+                    dic = dic.replaceAll("-1", "");
+                    objares.put("dic", dic);
+                    objares.put("country", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").optString("nazevStatu", "-1"));
                     
-                        String city = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").getString("nazevObce").isEmpty() ?
-                                jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").getString("nazevCastiObce") :
-                                jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").getString("nazevObce");
-                        objares.put("city", city);
+                    String city = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").getString("nazevObce").isEmpty() ?
+                    jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").optString("nazevCastiObce", "-1") :
+                    jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").optString("nazevObce", "-1");
+                    objares.put("city", city);
                     
-                        int zip = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").getInt("psc");
+                    int zip = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").optInt("psc", -1);
                     objares.put("zip", String.valueOf(zip));
-                    objares.put("street", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").getString("nazevUlice"));
+                    objares.put("street", jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").optString("nazevUlice", "-1"));
                     
                     int homeNum = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").optInt("cisloDomovni", -1);              
                     int indicNum =  jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getJSONObject("sidlo").optInt("cisloOrientacni", -1); 
@@ -90,22 +90,19 @@ public class ControllerIco {
                     
                     objares.put("number", number);
                     
-                        String fullstreet = objares.getString("street") + " " + objares.getString("number");
-                        objares.put("fullstreet", fullstreet.trim());
+                    String fullstreet = objares.getString("street") + " " + objares.optString("number", "-1");
+                    objares.put("fullstreet", fullstreet.trim());
                     
-                        // Here you would send the response back with status 200
-                        // This part is framework-specific and would depend on the Java web framework being used
-                    
-                        data.append("data", objares);
-
-                        String icodicDb = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getString("ico");
-                        String nameDb = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getString("obchodniJmeno");
-                    
-                        JSONObject JsonBody = new JSONObject();
-                        JsonBody.put("name", nameDb);
-                        JsonBody.put("icodic", icodicDb);
-                        JsonBody.put("unreliablePayer", "");
-                        String JsonString = JsonBody.toString();
+                    data.append("data", objares);
+                    String icodicDb = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getString("ico");
+                    String nameDb = jsondata.getJSONArray("ekonomickeSubjekty").getJSONObject(i).getString("obchodniJmeno");
+                
+                    JSONObject JsonBody = new JSONObject();
+                    JsonBody.put("name", nameDb);
+                    JsonBody.put("icodic", icodicDb);
+                    //JsonBody.put("icoKey", true);
+                    //JsonBody.put("dicKey", false);
+                    String JsonString = JsonBody.toString();
                     HttpClient clientDb = HttpClient.newHttpClient();
                     HttpRequest requestDB = HttpRequest.newBuilder()
                             .uri(URI.create(dbUrl))
@@ -115,7 +112,7 @@ public class ControllerIco {
                             .setHeader("Accept", "application/json")
                             .build();
 
-                            CompletableFuture<HttpResponse<String>> dbResponse = clientDb.sendAsync(requestDB, HttpResponse.BodyHandlers.ofString());
+                    CompletableFuture<HttpResponse<String>> dbResponse = clientDb.sendAsync(requestDB, HttpResponse.BodyHandlers.ofString());
                             
                     }
                     return "" + data;
@@ -266,7 +263,7 @@ public class ControllerIco {
                 String responseBody = response.thenApply(HttpResponse::body).get();
                 JSONObject jsonObject = XML.toJSONObject(responseBody);
                 allObject.put("data", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse"));
-         
+                
                 allObject.remove("xmlns");
                 allObject.remove("statusText");
                 allObject.remove("statusCode");
@@ -274,15 +271,29 @@ public class ControllerIco {
                 
                 for (int i = 0; i<=dic.size()-1; i++){
                     if(dic.size() == 1){
+                        JSONObject JsonBody = new JSONObject();
                         String nameDb = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getString("nazevSubjektu");
-                        int icodic = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getInt("dic");
+                        Object dicObject = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").get("dic");
+                        
+
+                        if(dicObject instanceof Integer){
+                            int icodic;
+                            icodic = (int) dicObject;
+                            String icodicDb = String.valueOf(icodic);
+                            JsonBody.put("icodic", icodicDb);
+                        }else if(dicObject instanceof String){
+                            String icodicDb;
+                            icodicDb = (String) dicObject;
+                            JsonBody.put("icodic", icodicDb);
+                        }
+
                         String unreliablePayer = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONObject("statusPlatceDPH").getString("nespolehlivyPlatce");
-                        String icodicDb = String.valueOf(icodic);
+                        
 
                         //this calls the DB RESTapi and POSTs data for entries
-                        JSONObject JsonBody = new JSONObject();
                         JsonBody.put("name", nameDb);
-                        JsonBody.put("icodic", icodicDb);
+                        //JsonBody.put("dicKey", true);
+                        //JsonBody.put("icoKey", false);
                         JsonBody.put("unreliablePayer", unreliablePayer);
                         String JsonString = JsonBody.toString();
                         HttpClient clientDb = HttpClient.newHttpClient();
@@ -297,15 +308,25 @@ public class ControllerIco {
                            
                     }else{
                         String nameDb = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getString("nazevSubjektu");
-                        int icodic = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getInt("dic");
+                        Object dicObject = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).get("dic");
                         String unreliablePayer = jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceRozsirenyResponse").getJSONArray("statusPlatceDPH").getJSONObject(i).getString("nespolehlivyPlatce");
-                        String icodicDb = String.valueOf(icodic);
-
-                        //this calls the DB RESTapi and POSTs data for entries
                         JSONObject JsonBody = new JSONObject();
+                        
+                        if(dicObject instanceof Integer){
+                            int icodic;
+                            icodic = (int) dicObject;
+                            String icodicDb = String.valueOf(icodic);
+                            JsonBody.put("icodic", icodicDb);
+                        }else if(dicObject instanceof String){
+                            String icodicDb;
+                            icodicDb = (String) dicObject;
+                            JsonBody.put("icodic", icodicDb);
+                        }
+                        //this calls the DB RESTapi and POSTs data for entries
                         JsonBody.put("name", nameDb);
-                        JsonBody.put("icodic", icodicDb);
                         JsonBody.put("unreliablePayer", unreliablePayer);
+                        //JsonBody.put("dicKey", true);
+                        //JsonBody.put("icoKey", false);
                         String JsonString = JsonBody.toString();
                         HttpClient clientDb = HttpClient.newHttpClient();
                         HttpRequest requestDB = HttpRequest.newBuilder()

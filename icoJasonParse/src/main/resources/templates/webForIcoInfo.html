@@ -79,10 +79,18 @@
             position: fixed;
             margin-right: 15em;
             z-index: -1;
+            display: inline-block;
+            top: 0;
+            margin-top: 5em;
         }
         .content {
             display: none;
             padding: 20px;
+        }
+        
+        .red{
+            background-color: #ffbb00;
+            
         }
     </style>
 </head>
@@ -126,7 +134,7 @@
     <div id="ICO" class="content">
 
         <div>
-            <table id="dataTableIco" class="md-tableError">
+            <table id="dataTableIco" class="md-tableView">
                 <thead>
                     <br>
                     <br>
@@ -151,7 +159,7 @@
 
     <div id="DIC" class="content">
         <div>
-            <table id="dataTableDic" class="md-tableWarning">
+            <table id="dataTableDic" class="md-tableView">
                 <thead>
                     <br>
                     <br>
@@ -235,7 +243,13 @@
             tableBodyDic.innerHTML = '';
 
             data.forEach(item => {
-                const row = '<tr><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.unreliablePayer + '</td><td>' + item.updatedAt + '</td></tr>';
+                let row = '<tr style="background-color: green; color: white"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.unreliablePayer + '</td><td>' + item.updatedAt + '</td></tr>';
+                console.log(item)
+                if(item.unreliablePayer == "ANO"){
+                    row = '<tr style="background-color: #d80027; color: white"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.unreliablePayer + '</td><td>' + item.updatedAt + '</td></tr>';
+                }else if(item.unreliablePayer == ""){
+                    row = '<tr style="background-color: #ffbb00; color: black"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>Unchecked/NotInDPH</td><td>' + item.updatedAt + '</td></tr>';
+                }
                 tableBodyDic.innerHTML += row;
             });
         }
