@@ -143,12 +143,12 @@
 
         <div class="fixed">
 
-            <form autocomplete="off">
+            <!--<form autocomplete="off">
+            </form>-->
 
                 <input type="text" id="icoInput" name="icoInput">
                 <button class="ui-button" onclick="createAresTextBox(); false;">ARES</button>
                 <button class="ui-button" onclick="createDphRegisterextBox(); false;">DPH Register</button>
-            </form>
 
 
         </div> 
@@ -519,10 +519,10 @@
                 this.parentNode.appendChild(a);
 
                 for(i = 0; i < icodicJson.length; i++){
-                    if (icodicJson[i].icodic.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                    if (icodicJson[i].icodic.substr(0, val.length).toUpperCase() == val.toUpperCase() || icodicJson[i].name.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
                         b = document.createElement("DIV");
                         b.innerHTML = "<strong>" + icodicJson[i].icodic.substr(0, val.length) + "</strong>";
-                        b.innerHTML += icodicJson[i].icodic.substr(val.length);
+                        b.innerHTML += icodicJson[i].icodic.substr(val.length) + " " + icodicJson[i].name;
                         b.innerHTML += "<input type='hidden' value='" + icodicJson[i].icodic + "'>";
                         b.addEventListener("click", function(e) {
                             inputData.value = this.getElementsByTagName("input")[0].value;
@@ -586,7 +586,6 @@
         dataPromise.then(data =>{
             const dataAutofill = data;
             autocomplete(document.getElementById("icoInput"), dataAutofill)
-            console.log(dataAutofill)
         }).catch(error => {
         
         console.error(error);
