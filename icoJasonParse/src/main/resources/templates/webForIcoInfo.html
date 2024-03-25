@@ -4,12 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> IcoInfo </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
     <link rel="stylesheet" href="http://lib.cb.madeta.cz/css/madeta-jqui.v4.css" />
     <style>
         
         body{
             margin: 0;
-            background-image: linear-gradient(to right, rgb(193, 210, 247), #014990);
+            animation: pulse 80s infinite;
+            /*background-image: linear-gradient(to right, rgb(193, 210, 247), #014990);*/
+        }
+        @keyframes pulse {
+            0%, 100%{
+                background-color:rgb(120, 154, 228);
+            }
+            25%, 75%{
+                background-color:#3f76ad;
+            }
+            50%{
+                background-color:#206d6d;
+
+            }
+            
         }
         .display-textContainer {
             
@@ -82,6 +97,7 @@
             display: inline-block;
             top: 0;
             margin-top: 5em;
+            
         }
         .content {
             display: none;
@@ -89,7 +105,17 @@
         }
         
         .red{
-            background-color: #ffbb00;
+            background-color: #DC143C;
+            color: #ffffff;
+            
+        }
+        .green{
+            background-color: #14DCB4;
+            color: #000000;
+            
+        }
+        .blue{
+            background-color: #10E3E3;
             
         }
         .autocomplete-items {
@@ -146,21 +172,22 @@
             <!--<form autocomplete="off">
             </form>-->
 
-                <input type="text" id="icoInput" name="icoInput">
+                <input type="text" id="icoInput" name="icoInput" autocomplete="off">
                 <button class="ui-button" onclick="createAresTextBox(); false;">ARES</button>
                 <button class="ui-button" onclick="createDphRegisterextBox(); false;">DPH Register</button>
 
 
         </div> 
 
-        <br>
+        
         <div class="img-logo" id="imgContainer">
             <img src="http://localhost:8080/resources/madeta_logo.png" alt="madeta logo">
         </div>
-        <div class="display-textContainer" id="textBoxContainer"></div>
-        <div class="display-textContainer" id="textBoxContainer2"></div>
+        <div>
+            <div class="display-textContainer" id="textBoxContainer"></div>
+            <div class="display-textContainer" id="textBoxContainer2"></div>
+        </div>
     </div>
-
     <div id="ICO" class="content">
 
         <div>
@@ -200,12 +227,13 @@
                         <th>dic</th>
                         <th>unreliablePayer</th>
                         <th>updatedAt</th>
+                        <th>toPdf</th>
                     </tr>
                 </thead>
                 <tbody id="tableBodyDic">
 
                 </tbody>
-
+                <div id="pdfContainer"></div>
             </table>
         </div>
         <div class="img-logo" id="imgContainer">
@@ -237,7 +265,6 @@
         <div class="img-logo" id="imgContainer">
             <img src="http://localhost:8080/resources/madeta_logo.png" alt="madeta logo">
         </div>
-
     </div>
 
     <script>
@@ -269,19 +296,62 @@
         async function populateTableDic(){
             const data = await fetchBDDic();
             const tableBodyDic = document.getElementById('tableBodyDic')
-
+            const tableBodyUnreliablePayer = document.getElementById('tableBodyUnreliablePayer')
             tableBodyDic.innerHTML = '';
-            console.log(data)
             data.forEach(item => {
-                let row = '<tr style="background-color: green; color: white"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.unreliablePayer + '</td><td>' + item.updatedAt + '</td></tr>';
-                //console.log(item)
+                let icodic = item.icodic;
+
+                //let icodicString = icodicInt.toFixed(0);
+                let row = '<tr class="green"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.unreliablePayer + '</td><td>' + item.updatedAt + '</td><td></td></tr>';
                 if(item.unreliablePayer == "ANO"){
-                    row = '<tr style="background-color: #d80027; color: white"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.unreliablePayer + '</td><td>' + item.updatedAt + '</td></tr>';
+                    row = '<tr class="red"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>' + item.unreliablePayer + '</td><td>' + item.updatedAt + '</td><td>' + '<button class="ui-button" onclick="printPdf(' + "'" + icodic + "'" + ')"; return false;>Pdf print</button>' + '</td></tr>';
+
                 }else if(item.unreliablePayer == ""){
-                    row = '<tr style="background-color: #ffbb00; color: black"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>Unchecked/NotInDPH</td><td>' + item.updatedAt + '</td></tr>';
+                    row = '<tr style="background-color: #ffbb00; color: black"><td>' + item.id +'</td><td>' + item.name + '</td><td>' + item.icodic + '</td><td>Unchecked/NotInDPH</td><td>"' + item.updatedAt + '"</td></tr>';
                 }
                 tableBodyDic.innerHTML += row;
             });
+
+            
+        }
+//pdf print button func
+        function printPdf(icodic){
+            console.log(icodic)
+            console.log(typeof(icodic));
+            fetch('http://localhost:8080/icoJasonParse-0.0.1-SNAPSHOT/printPDF', {
+                method: "POST",
+                headers: {
+                         "Content-type": "application/json;charset=UTF-8"
+                },
+                body: icodic
+            })            
+            .then(response => {
+                const filename = response.headers.get('Content-Disposition').split('filename=')[1];
+                return response.blob().then(blob => ({ filename, blob }));})
+            .then(data => {
+                const { filename, blob } = data;
+                const blobUrl = URL.createObjectURL(blob);
+                console.log(blob, filename)
+                
+                const downloadLink = document.createElement('a');
+                downloadLink.href = blobUrl;
+                downloadLink.download = filename + ".pdf"; 
+                        
+                document.body.appendChild(downloadLink);
+                        
+                downloadLink.click();
+                        
+                document.body.removeChild(downloadLink);
+            })
+            .catch(error => {
+            console.error('Error:', error);
+            });
+                
+            //const {jsPDF} = window.jspdf;
+//
+            //const doc = new jsPDF();
+            //doc.text("PDF for dic", 100, 10, align = "center" );  
+            //doc.save(icodic + ".pdf");
         }
 //data table for icodic
         async function fetchBDIcodic(){
@@ -337,9 +407,16 @@
 
             var inputData = document.getElementById("icoInput").value;
             var dicValues = inputData.split(',').map(value => value.trim());
+            
+            for (var i = 0; i <= dicValues.length - 1; i++){
+                if(dicValues[i] == ""){
+                    dicValues[i] = dicValues[i+1];
+                }
+            }
             var jsonData = JSON.stringify(dicValues);
+            
+            
 
-            console.log(inputData)
             fetch('http://localhost:8080/icoJasonParse-0.0.1-SNAPSHOT/fetchAres', {
                 method: "POST",
                 headers: {
@@ -386,9 +463,15 @@
         function createDphRegisterextBox(){
             var inputData = document.getElementById("icoInput").value;
             var dicValues = inputData.split(',').map(value => value.trim());
+
+            for (var i = 0; i <= dicValues.length - 1; i++){
+                if(dicValues[i] == ""){
+                    dicValues[i] = dicValues[i+1];
+                }
+            }
+            var jsonData = JSON.stringify(dicValues);
             var jsonData = JSON.stringify(dicValues);
 
-            console.log(inputData)
             fetch('http://localhost:8080/icoJasonParse-0.0.1-SNAPSHOT/fetchDPHStatus' , {
                 method: "POST",
                 headers: {
@@ -417,7 +500,6 @@
         }
     
         function showMoreInfoOnUnreliablePayer(dics){
-            console.log(dics + "****")
             
             var inputData = document.getElementById("icoInput").value;
             var dicValues = inputData.split(',').map(value => value.trim());
@@ -439,7 +521,6 @@
                 if (fetch_status == 200){
                     var textContainer = document.getElementById("textBoxContainer");
                     
-                    console.log(json.data)
                     iterateObject(json.data)                  
                   
                 }                
@@ -452,21 +533,12 @@
         function iterateObject(obj, depth = 0){
             for (let key in obj){
                 var textContainer = document.getElementById("textBoxContainer2");
-                console.log(obj, key + "---------")
-                if(key === "num"){
-                    if(obj[key] % 2 == 0){
-                         textContainer = document.getElementById("textBoxContainer2");
-                    }
-                    else{
-                        textContainer = document.getElementById("textBoxContainer3");
-                    }
-                }
+                
                 
                 if(obj.hasOwnProperty(key)){
                     if(typeof obj[key] === 'object' && obj[key] !== null){
                         iterateObject(obj[key], depth + 1);
                     }else{
-                        console.log("else")
                         if(key === "datumZverejneni"){
                             textContainer.appendChild(document.createElement("hr"));
                         }
@@ -487,15 +559,25 @@
                         var label = document.createElement("label");
                         label.style.cssText = 'display: inline-block; width:15em;';
                         label.innerHTML = key;
-                            
-                        var textBox = document.createElement("input");
-                        textBox.type = "text";
-                        textBox.readOnly = true;
-                        textBox.value = obj[key];
                         
-                        textContainer.appendChild(label);
-                        textContainer.appendChild(textBox);
+                        if(key == "xmlns"){
+                            var link = document.createElement("a");
+                            link.value = obj[key];
+                            link.textContent = "adis"
+                            link.href = "http://adis.mfcr.cz/rozhraniCRPDPH/";
+                            textContainer.appendChild(document.createElement("hr"));
+                            textContainer.appendChild(label);
+                            textContainer.appendChild(link);
 
+                        }else{    
+                            var textBox = document.createElement("input");
+                            textBox.value = obj[key];
+                            textBox.type = "text";
+                            textBox.readOnly = true;
+                            textContainer.appendChild(label);
+                            textContainer.appendChild(textBox);
+                        }
+                            
                         textContainer.appendChild(document.createElement("br"));
                         
                     }
@@ -522,7 +604,7 @@
                     if (icodicJson[i].icodic.substr(0, val.length).toUpperCase() == val.toUpperCase() || icodicJson[i].name.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
                         b = document.createElement("DIV");
                         b.innerHTML = "<strong>" + icodicJson[i].icodic.substr(0, val.length) + "</strong>";
-                        b.innerHTML += icodicJson[i].icodic.substr(val.length) + " " + icodicJson[i].name;
+                        b.innerHTML += icodicJson[i].icodic.substr(val.length) + "&emsp;"  + icodicJson[i].name;
                         b.innerHTML += "<input type='hidden' value='" + icodicJson[i].icodic + "'>";
                         b.addEventListener("click", function(e) {
                             inputData.value = this.getElementsByTagName("input")[0].value;
@@ -579,9 +661,6 @@
             });
         }
 
-        //const responsAutofill = fetch('http://localhost:8080/mariaDbForIcodic-0.0.1-SNAPSHOT/fetchBDIcodic')
-        //const dataAutofill = responsAutofill.json();
-        //console.log(dataAutofill);
         const dataPromise = fetchBDIcodic();
         dataPromise.then(data =>{
             const dataAutofill = data;
@@ -591,7 +670,21 @@
         console.error(error);
         });
         
-       
+        //fetch('https://intranet.cb.madeta.cz/html/body/div[1]/div[2]/div[3]/div[1]/div[1]/div')
+        //    .then(response => response.text())
+        //    .then(html => {
+        //        const blogDiv = document.createElement("div");
+        //        blogDiv.innerHTML = html;
+        //        document.body.appendChild(blogDiv);
+        //    })
+        //    .catch(error => {
+        //        console.log("ERROR ", error );
+        //    })
+        function isEmpty(value) {
+  return (typeof value === 'undefined' || value === null || value === '' ||
+    (typeof value === 'object' && Object.keys(value).length == 0) ||
+    (typeof value === 'string' && value.toLowerCase() === 'invalid date'));
+}
     </script>
 
 

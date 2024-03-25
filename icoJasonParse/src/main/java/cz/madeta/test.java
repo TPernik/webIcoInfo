@@ -1,18 +1,19 @@
 package cz.madeta;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.lowagie.text.DocumentException;
 
 import cz.madeta.icoJasonParse.ControllerIco;
 //import cz.madeta.icoJasonParse.services.EntityServices;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class test {
 
-    public static void main(String[] args) throws JsonProcessingException{
+    public static void main(String[] args) throws DocumentException, IOException{
 
         ControllerIco testControllerIco = new ControllerIco();
 
@@ -24,13 +25,19 @@ public class test {
         //dic.add("09533702");
         dic.add("5706210818");
         //ico.add("63275635");
-        ico.add("69696420");
+        ico.add("24220019");
         //ico.add("63275635");
 
         //System.out.println(testControllerIco.fetchDataAres(ico));
         //System.out.println(testControllerIco.fetchDataAres(ico));
-        System.out.println(testControllerIco.fetchAdditionalInfoFor(dic));
+        System.out.println(testControllerIco.printPDF("10833722"));
+        
     }
-    
-    
+        //private ControllerIco pdfControllerIco = new ControllerIco();
+        //public test(ControllerIco tesControllerIco){
+        //    this.pdfControllerIco = pdfControllerIco;
+        //}
+        //public void testPDF(HttpServletResponse response){
+        //    
+        //}
 }

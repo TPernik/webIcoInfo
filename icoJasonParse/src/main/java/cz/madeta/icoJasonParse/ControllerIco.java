@@ -4,14 +4,18 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+
 import org.json.JSONObject;
 import org.json.XML;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,8 +23,27 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
+
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @SpringBootApplication
 @RestController
@@ -100,8 +123,7 @@ public class ControllerIco {
                     JSONObject JsonBody = new JSONObject();
                     JsonBody.put("name", nameDb);
                     JsonBody.put("icodic", icodicDb);
-                    //JsonBody.put("icoKey", true);
-                    //JsonBody.put("dicKey", false);
+                    JsonBody.put("unreliablePayer", "");
                     String JsonString = JsonBody.toString();
                     HttpClient clientDb = HttpClient.newHttpClient();
                     HttpRequest requestDB = HttpRequest.newBuilder()
@@ -192,10 +214,7 @@ public class ControllerIco {
                                 data.put("status", jsonObject.getJSONObject("soapenv:Envelope").getJSONObject("soapenv:Body").getJSONObject("StatusNespolehlivyPlatceResponse").getJSONObject("status").getString("statusText"));
                                 
                                 objDph.append("data", data);
-                                //objDph.append("allData", allObject);
                                 allObject.append("num", i);
-
-                                
                             
                             }
                             return "" + allObject;
@@ -219,6 +238,94 @@ public class ControllerIco {
                 
 
             return "true";
+        }
+
+        @PostMapping(value = "/printPDF")
+        public ResponseEntity<byte[]>printPDF (@RequestBody String dic) throws DocumentException, IOException{
+            //Set<String> dics = new HashSet<>(dic);
+            List<String> dicNum = new ArrayList<String>();    
+            dicNum.add(dic);
+
+            String dicData = fetchAdditionalInfoFor(dicNum);
+            JsonObject jsonObject = JsonParser.parseString(dicData).getAsJsonObject();
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            Document document = new Document(PageSize.A4); 
+            PdfWriter.getInstance(document, byteArrayOutputStream).setInitialLeading(12.5f);
+            
+            //response.setContentType("application/pdf");
+            //response.setHeader("Content-Disposition", "attachment; filename=\"output.pdf\"");
+
+            document.open();
+            
+            Font fontTitle = FontFactory.getFont(FontFactory.TIMES_BOLD, "UTF-8");
+            fontTitle.setSize(24);
+            String title = jsonObject.getAsJsonObject("data").getAsJsonObject("statusPlatceDPH").get("nazevSubjektu").getAsString();
+            Paragraph titleParagraph = new Paragraph(title, fontTitle);
+            titleParagraph.setAlignment(Paragraph.ALIGN_CENTER);
+
+            Font fontBody = FontFactory.getFont(FontFactory.TIMES_ROMAN, "UTF-8");
+            fontBody.setSize(14);
+            
+            document.add(titleParagraph);
+            
+            iterateJsonObject(jsonObject, document, fontBody);
+            document.close();
+
+            byte[] pdfBytes = byteArrayOutputStream.toByteArray();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType((MediaType.APPLICATION_PDF));
+            headers.setContentDispositionFormData(title, title);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+            //var test = jsonObject.getAsJsonObject("data").getAsJsonObject("statusPlatceDPH").getAsJsonObject("nazevSubjektu").getAsString();
+            //return "" + test;
+ 
+        }
+        private void iterateJsonObject(JsonObject jsonObject, Document document, Font fontBody) throws DocumentException {
+            for (java.util.Map.Entry<String, JsonElement> entry : jsonObject.entrySet()) {
+                //if(entry instanceof ArrayList){
+                    String key = entry.getKey();
+                    JsonElement value = entry.getValue();
+                    if (value.isJsonObject()) {
+                        iterateJsonObject(value.getAsJsonObject(), document, fontBody);
+                    }else if(value.isJsonArray()) {
+                        JsonArray jsonArray = value.getAsJsonArray();
+                        Paragraph arrayParagraph = new Paragraph(key, fontBody);
+                        arrayParagraph.setAlignment(Paragraph.ALIGN_LEFT);
+                        document.add(arrayParagraph);
+            
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JsonElement arrayElement = jsonArray.get(i);
+                            Paragraph elementParagraph = new Paragraph(arrayElement.toString(), fontBody);
+                            elementParagraph.setAlignment(Paragraph.ALIGN_LEFT);
+                            document.add(elementParagraph);
+                        }
+                    }
+                    else {
+                        //for some reason doesn't work(bullshit)
+                        if(key != "\"xmlns\""){
+
+                            Paragraph bodyParagraph = new Paragraph(key + ": " + value, fontBody);
+                            bodyParagraph.setAlignment(Paragraph.ALIGN_LEFT);
+                            document.add(bodyParagraph);
+                        }
+                    }
+                //}else{
+                //    String key = entry.getKey();
+                //    JsonElement value = entry.getValue();
+        //
+                //    if (value.isJsonObject() || value.isJsonArray()) {
+                //    iterateJsonObject(value.getAsJsonArray(), document, fontBody);
+                //    } else {
+                //    Paragraph bodyParagraph = new Paragraph(key + ": " + value, fontBody);
+                //    bodyParagraph.setAlignment(Paragraph.ALIGN_LEFT);
+                //    document.add(bodyParagraph);
+                //    }
+                //}
+                
+            }
         }
 
         //this method is being called simultaneously with fetchDPHStatus and gives additional data
@@ -267,7 +374,6 @@ public class ControllerIco {
                 allObject.remove("xmlns");
                 allObject.remove("statusText");
                 allObject.remove("statusCode");
-                allObject.append("addracc", addObjects);
                 
                 for (int i = 0; i<=dic.size()-1; i++){
                     if(dic.size() == 1){
@@ -297,8 +403,6 @@ public class ControllerIco {
 
                         //this calls the DB RESTapi and POSTs data for entries
                         JsonBody.put("name", nameDb);
-                        //JsonBody.put("dicKey", true);
-                        //JsonBody.put("icoKey", false);
                         JsonBody.put("unreliablePayer", unreliablePayer);
                         String JsonString = JsonBody.toString();
                         HttpClient clientDb = HttpClient.newHttpClient();
@@ -330,8 +434,6 @@ public class ControllerIco {
                         //this calls the DB RESTapi and POSTs data for entries
                         JsonBody.put("name", nameDb);
                         JsonBody.put("unreliablePayer", unreliablePayer);
-                        //JsonBody.put("dicKey", true);
-                        //JsonBody.put("icoKey", false);
                         String JsonString = JsonBody.toString();
                         HttpClient clientDb = HttpClient.newHttpClient();
                         HttpRequest requestDB = HttpRequest.newBuilder()

@@ -51,7 +51,7 @@ public class DataReceiver {
             EntityIco icodicnameIco = new EntityIco(nameString, icodicString, currentTime);
             
             EntityDic icodicnameDic;
-            if(icodics.unreliablePayer != "" ){
+            if(unreliablePayer != "" && unreliablePayer != null){
                 icodicnameDic = new EntityDic(nameString, icodicString, currentTime, unreliablePayer);
 
                 if(!entityServices.entityExistsDic(icodicString)){
