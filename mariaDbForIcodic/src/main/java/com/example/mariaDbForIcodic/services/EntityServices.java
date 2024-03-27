@@ -216,7 +216,7 @@ public class EntityServices {
             }
         }
     }
-    @Scheduled(fixedRate = 86400000)
+    @Scheduled(cron = "0 0 * * * *")
     public void updateDatabaseIco(){
         List<EntityIco> entities = entityRepositoryIco.findAll();
         for (EntityIco entityIco : entities) {

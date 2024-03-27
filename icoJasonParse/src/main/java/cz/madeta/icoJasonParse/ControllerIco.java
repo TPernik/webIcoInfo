@@ -11,6 +11,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -18,11 +19,22 @@ import java.util.concurrent.TimeoutException;
 
 import org.json.JSONObject;
 import org.json.XML;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.HandlerMapping;
+import org.springframework.web.servlet.mvc.condition.RequestCondition;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,7 +54,7 @@ import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
 
-
+import cz.madeta.icoJasonParse.beanFinder.BeanPrinter;
 import jakarta.servlet.http.HttpServletResponse;
 
 @SpringBootApplication
@@ -50,9 +62,22 @@ import jakarta.servlet.http.HttpServletResponse;
 @Service
 public class ControllerIco {
     
+    @Autowired
+    private ApplicationContext context;
+    //@Autowired
+    //private RequestMappingHandlerMapping reqMapping;
+    
+    //@Autowired
+    //private final RequestMappingInfo requestMappingInfo;
+
+    
     //Get List of icos by POST and than send another POST to get info from ARES about companies
     @PostMapping(value = "/fetchAres")
     public String fetchDataAres(@RequestBody List<String> ico) throws JsonProcessingException{
+        
+        //BeanPrinter beanPrinter = new BeanPrinter();
+        //beanPrinter.printBeanDetails();
+
         
         String url = "https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/vyhledat";
         String dbUrl = "http://localhost:8080/mariaDbForIcodic-0.0.1-SNAPSHOT/icodicDbAdd";
@@ -74,6 +99,7 @@ public class ControllerIco {
             JSONObject data = new JSONObject();
             try {               
                 
+       
                 HttpResponse<String> response = futureResponse.get();
                 String responseBody = response.body();
                 JSONObject jsondata = new JSONObject(responseBody);
@@ -137,7 +163,7 @@ public class ControllerIco {
                     CompletableFuture<HttpResponse<String>> dbResponse = clientDb.sendAsync(requestDB, HttpResponse.BodyHandlers.ofString());
                             
                     }
-                    return "" + data;
+                    return "" + data ;
 
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
@@ -146,15 +172,70 @@ public class ControllerIco {
                 // Handle timeout, possibly return an error response
             } catch (Exception e) {
                 String errText = e.getMessage();
+                return errText;
                 // Handle other exceptions, possibly return an error response
             }
-            
 
             return "true";
          
-         
         }
-        
+        //returns info about beans and abou servletdispatcher that has mapping about urls and such
+        @GetMapping(value = "/getServletDispatcher")
+        public String getServletDispatcher(){
+            JSONObject returnObject = new JSONObject();
+            JSONObject data = new JSONObject();
+            JSONObject beans = new JSONObject();
+            returnObject.put("data", data);
+            returnObject.getJSONObject("data").put("beans", beans);
+            //for all beans
+            try{
+                String[] beanNames = context.getBeanDefinitionNames();
+            String returnData = "";
+            for (String beanName : beanNames) {
+                Object bean = context.getBean(beanName);
+                returnData = returnData + beanName + ":" + bean;
+                returnObject.getJSONObject("data").getJSONObject("beans").put(beanName, returnData);
+                
+            }
+            //for dispatcherservlet internall beans
+            DispatcherServlet dispatcherServlet = context.getBean(DispatcherServlet.class);
+            String servletName = dispatcherServlet.getServletName();
+            String dispatcherInfo = "ServletDispatcher: " + servletName + ":";
+            List<HandlerMapping> mappings = dispatcherServlet.getHandlerMappings();
+            for (HandlerMapping mapping : mappings) {
+                dispatcherInfo = dispatcherInfo + mapping ;
+                returnObject.getJSONObject("data").append(servletName, dispatcherInfo);
+
+            }
+            //for paths in dispatchrservlet
+            dispatcherInfo = dispatcherInfo + "Dispatcher: \n";
+            RequestMappingHandlerMapping requestMappingHandlerMapping =
+                    context.getBean(RequestMappingHandlerMapping.class);
+            Map<RequestMappingInfo, HandlerMethod> handlerMethods =
+            requestMappingHandlerMapping.getHandlerMethods();
+            for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
+                RequestMappingInfo mappingInfo = entry.getKey();
+                RequestCondition<Object> patternsCondition = mappingInfo.getActivePatternsCondition();
+                Set<String> directPaths = mappingInfo.getDirectPaths();
+                Set<String> patternValues = mappingInfo.getPatternValues();
+                HandlerMethod handlerMethod = entry.getValue();
+                //dispatcherInfo = dispatcherInfo + "Mapping: " + mappingInfo.getPatternsCondition() + "\n" + "Handler: " + handlerMethod.getMethod().getDeclaringClass().getName() +
+                //"#" + handlerMethod.getMethod().getName() + "\n Direct paths: " + directPaths + "\n Pattern values: " + patternValues + "\n Pattern condition: " + patternsCondition + "\n";
+                
+                returnObject.getJSONObject("data").append("handlers", handlerMethod.getMethod().getDeclaringClass().getName() + "#" + handlerMethod.getMethod().getName());
+                returnObject.getJSONObject("data").append("directPaths", directPaths);
+                returnObject.getJSONObject("data").append("patternsConditions", patternsCondition);
+                returnObject.getJSONObject("data").append("patternValues", patternValues);
+                
+            }
+            
+            }catch(Exception e){
+                String errText = e.getMessage();
+                return errText;
+            }
+            return returnObject.toString();
+            }
+
         @PostMapping(value = "/fetchDPHStatus")
         public String fetchDataDPHStatus(@RequestBody List<String> dic) {
         
@@ -239,7 +320,7 @@ public class ControllerIco {
 
             return "true";
         }
-
+        //method for printing pdf file with info from adis
         @PostMapping(value = "/printPDF")
         public ResponseEntity<byte[]>printPDF (@RequestBody String dic) throws DocumentException, IOException{
             //Set<String> dics = new HashSet<>(dic);
@@ -252,15 +333,14 @@ public class ControllerIco {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             Document document = new Document(PageSize.A4); 
             PdfWriter.getInstance(document, byteArrayOutputStream).setInitialLeading(12.5f);
-            
-            //response.setContentType("application/pdf");
-            //response.setHeader("Content-Disposition", "attachment; filename=\"output.pdf\"");
 
             document.open();
             
             Font fontTitle = FontFactory.getFont(FontFactory.TIMES_BOLD, "UTF-8");
             fontTitle.setSize(24);
             String title = jsonObject.getAsJsonObject("data").getAsJsonObject("statusPlatceDPH").get("nazevSubjektu").getAsString();
+            String icodic = jsonObject.getAsJsonObject("data").getAsJsonObject("statusPlatceDPH").get("dic").getAsString();
+
             Paragraph titleParagraph = new Paragraph(title, fontTitle);
             titleParagraph.setAlignment(Paragraph.ALIGN_CENTER);
 
@@ -275,12 +355,11 @@ public class ControllerIco {
             byte[] pdfBytes = byteArrayOutputStream.toByteArray();
 
             HttpHeaders headers = new HttpHeaders();
+            
             headers.setContentType((MediaType.APPLICATION_PDF));
-            headers.setContentDispositionFormData(title, title);
+            headers.setContentDispositionFormData(icodic, icodic);
 
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
-            //var test = jsonObject.getAsJsonObject("data").getAsJsonObject("statusPlatceDPH").getAsJsonObject("nazevSubjektu").getAsString();
-            //return "" + test;
  
         }
         private void iterateJsonObject(JsonObject jsonObject, Document document, Font fontBody) throws DocumentException {
@@ -315,7 +394,7 @@ public class ControllerIco {
                 //}else{
                 //    String key = entry.getKey();
                 //    JsonElement value = entry.getValue();
-        //
+        
                 //    if (value.isJsonObject() || value.isJsonArray()) {
                 //    iterateJsonObject(value.getAsJsonArray(), document, fontBody);
                 //    } else {
